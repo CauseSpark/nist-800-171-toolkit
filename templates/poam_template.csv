@@ -1,0 +1,2 @@
+poam_id,requirement_id,weakness,risk_level,point_value,planned_remediation,resources_required,owner,milestone,scheduled_completion,status,comments
+POAM-EXAMPLE,3.5.3,"MFA enforced on VPN and admin accounts only; standard user logons use password only",High,3,"Extend IdP conditional access MFA policy to all users in the CUI enclave","IdP licenses; 16 admin hours",IT Lead,"Pilot group enrolled; then all users enrolled",YYYY-MM-DD,Open,"EXAMPLE ROW for fictional Acme Defense Fabrication - delete before use"
