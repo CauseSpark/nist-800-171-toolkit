@@ -138,27 +138,15 @@ def test_status_spellings_are_normalized(tmp_path, reqs):
     assert loaded["3.1.16"] == "n/a"
 
 
-def test_invalid_status_rejected(tmp_path, reqs):
-    statuses = all_status(reqs, "met")
-    statuses["3.1.1"] = "mostly"
-    path = write_assessment(tmp_path / "a.csv", statuses)
-    with pytest.raises(ValidationError, match="must be one of"):
-        sprs.load_assessment(path, reqs)
-
-
-def test_unknown_id_rejected(tmp_path, reqs):
-    statuses = all_status(reqs, "met")
-    statuses["3.99.1"] = "met"
-    path = write_assessment(tmp_path / "a.csv", statuses)
-    with pytest.raises(ValidationError, match="unknown requirement id"):
-        sprs.load_assessment(path, reqs)
-
-
-def test_missing_rows_rejected(tmp_path, reqs):
-    statuses = all_status(reqs, "met")
-    del statuses["3.14.7"]
-    path = write_assessment(tmp_path / "a.csv", statuses)
-    with pytest.raises(ValidationError, match="missing status for: 3.14.7"):
+@pytest.mark.parametrize("rid, status, message", [
+    pytest.param("3.1.1", "mostly", "must be one of", id="invalid_status"),
+    pytest.param("3.99.1", "met", "unknown requirement id", id="unknown_id"),
+    pytest.param("3.14.7", None, "missing status for: 3.14.7", id="missing_row"),   # None drops the row
+])
+def test_bad_rows_rejected(tmp_path, reqs, rid, status, message):
+    statuses = {**all_status(reqs, "met"), rid: status}
+    path = write_assessment(tmp_path / "a.csv", {r: s for r, s in statuses.items() if s is not None})
+    with pytest.raises(ValidationError, match=message):
         sprs.load_assessment(path, reqs)
 
 
